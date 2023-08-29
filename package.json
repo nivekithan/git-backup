@@ -1,0 +1,28 @@
+{
+  "name": "git-backup",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "dev": "node -r esbuild-register src/index.ts",
+    "build": "esbuild src/index.ts --bundle --outfile=dist/out.js --platform=node"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/better-sqlite3": "^7.6.4",
+    "@types/github-url-from-git": "^1.5.1",
+    "@types/node": "^20.5.7",
+    "esbuild": "^0.19.2",
+    "esbuild-register": "^3.4.2"
+  },
+  "dependencies": {
+    "better-sqlite3": "^8.5.2",
+    "commander": "^11.0.0",
+    "env-paths": "^3.0.0",
+    "git-remote-origin-url": "^4.0.0",
+    "github-url-from-git": "^1.5.0",
+    "make-dir": "^4.0.0"
+  }
+}
