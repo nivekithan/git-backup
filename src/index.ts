@@ -77,7 +77,7 @@ program.command("sync").action(async () => {
     })
   );
 
-  console.log(res);
+  console.log(`Created file: ${res.map((row) => row.file_name).join(",")}`);
 });
 
 program.parse();

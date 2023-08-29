@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "dev": "node -r esbuild-register src/index.ts",
-    "build": "esbuild src/index.ts --bundle --outfile=dist/out.js --platform=node"
+    "build": "esbuild src/index.ts --outfile=dist/out.js --platform=node --banner:js='#!/usr/bin/env node' --bundle --packages=external"
   },
   "keywords": [],
   "author": "",
@@ -24,5 +24,8 @@
     "git-remote-origin-url": "^4.0.0",
     "github-url-from-git": "^1.5.0",
     "make-dir": "^4.0.0"
+  },
+  "bin": {
+    "bk": "./dist/out.js"
   }
 }
