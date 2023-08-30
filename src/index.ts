@@ -29,55 +29,69 @@ program
 program
   .argument("<filename>", "Files to backup")
   .action(async (filename: string) => {
-    const { readFile } = await import("node:fs/promises");
-    const crypto = await import("node:crypto");
-    const githubUrl = await getGithubUrl();
-    const db = await getDb();
+    try {
+      const { readFile } = await import("node:fs/promises");
+      const crypto = await import("node:crypto");
+      const githubUrl = await getGithubUrl();
+      const db = await getDb();
 
-    const fileContent = await readFile(filename);
+      const fileContent = await readFile(filename);
 
-    const res = db
-      .prepare(
-        `INSERT INTO files (id, repo_name, file_name, file_content) 
+      const res = db
+        .prepare(
+          `INSERT INTO files (id, repo_name, file_name, file_content) 
     VALUES (@id, @repoName, @fileName, @fileContent)
     RETURNING * ;`
-      )
-      .all({
-        id: crypto.randomUUID(),
-        repoName: githubUrl,
-        fileName: filename,
-        fileContent,
-      } satisfies {
-        id: string;
-        repoName: string;
-        fileName: string;
-        fileContent: Buffer;
-      }) as [FileRow];
+        )
+        .all({
+          id: crypto.randomUUID(),
+          repoName: githubUrl,
+          fileName: filename,
+          fileContent,
+        } satisfies {
+          id: string;
+          repoName: string;
+          fileName: string;
+          fileContent: Buffer;
+        }) as [FileRow];
 
-    const row = res[0];
+      const row = res[0];
 
-    console.log(`Stored file: ${filename}`);
+      console.log(`Stored file: ${filename}`);
+    } catch (err) {
+      console.log("Command failed with error: ", err);
+      console.log(
+        "Make sure you have run `gb setup` before running this command"
+      );
+    }
   });
 
 program.command("sync").action(async () => {
-  const { writeFile } = await import("node:fs/promises");
+  try {
+    const { writeFile } = await import("node:fs/promises");
 
-  const db = await getDb();
-  const githubUrl = await getGithubUrl();
+    const db = await getDb();
+    const githubUrl = await getGithubUrl();
 
-  const res = db
-    .prepare(
-      `SELECT id, repo_name, file_name, file_content FROM files WHERE repo_name == @repoUrl;`
-    )
-    .all({ repoUrl: githubUrl } satisfies { repoUrl: string }) as FileRow[];
+    const res = db
+      .prepare(
+        `SELECT id, repo_name, file_name, file_content FROM files WHERE repo_name == @repoUrl;`
+      )
+      .all({ repoUrl: githubUrl } satisfies { repoUrl: string }) as FileRow[];
 
-  await Promise.all(
-    res.map(({ file_content, file_name }) => {
-      return writeFile(file_name, file_content);
-    })
-  );
+    await Promise.all(
+      res.map(({ file_content, file_name }) => {
+        return writeFile(file_name, file_content);
+      })
+    );
 
-  console.log(`Created file: ${res.map((row) => row.file_name).join(",")}`);
+    console.log(`Created file: ${res.map((row) => row.file_name).join(",")}`);
+  } catch (err) {
+    console.log("Command failed with error: ", err);
+    console.log(
+      "Make sure you have run `gb setup` before running this command"
+    );
+  }
 });
 
 program.parse();
